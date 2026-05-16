@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberWing Landing Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "framer-motion": "https://esm.sh/framer-motion@11.1.7?deps=react@18.2.0,react-dom@18.2.0"
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Teko:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    /* Basic reset and scrollbar styling */
+    body {
+      margin: 0;
+      background-color: #fafafa;
+      background-image: repeating-linear-gradient(90deg, transparent, transparent 99px, rgba(0, 0, 0, 0.03) 99px, rgba(0, 0, 0, 0.03) 100px);
+      background-attachment: fixed;
+      color: #334155;
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script type="module">
+    import React from 'react';
+    import { createRoot } from 'react-dom/client';
+    import * as framerMotion from 'framer-motion';
+
+    async function loadApp() {
+      try {
+        const response = await fetch('./LandingPage.jsx');
+        let code = await response.text();
+
+        // 1. Remove import statements so browser doesn't trip on them in eval
+        code = code.replace(/import.*?['"].*?['"];?/g, '');
+
+        // 2. Expose the component globally
+        code = code.replace(/export\s+default\s+function\s+LandingPage/, 'window.LandingPage = function LandingPage');
+
+        // 3. Transpile JSX using Babel Standalone
+        const transpiled = Babel.transform(code, { presets: ['react'] }).code;
+
+        // 4. Inject dependencies into global window scope so the transpiled code can access them
+        window.React = React;
+        window.useState = React.useState;
+        window.useEffect = React.useEffect;
+        window.useRef = React.useRef;
+
+        window.motion = framerMotion.motion;
+        window.useScroll = framerMotion.useScroll;
+        window.useTransform = framerMotion.useTransform;
+        window.animate = framerMotion.animate;
+
+        // 5. Evaluate the code
+        eval(transpiled);
+
+        // 6. Render the React Component
+        const root = createRoot(document.getElementById('root'));
+        root.render(React.createElement(window.LandingPage));
+
+      } catch (err) {
+        console.error("Error loading the app:", err);
+        document.getElementById('root').innerHTML = `<div style="color:red; padding: 20px;">Error loading application. Check console.</div>`;
+      }
+    }
+
+    loadApp();
+  </script>
+</body>
+
+</html>
