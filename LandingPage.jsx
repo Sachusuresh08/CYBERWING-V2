@@ -103,6 +103,7 @@ const StickySection = () => {
 
 
 const CryptoNetwork = () => {
+  const AnimatePresence = window.AnimatePresence || (({children}) => <>{children}</>);
   const { scrollY } = window.motion ? { scrollY: window.useScroll().scrollY } : { scrollY: { get: () => 0, onChange: () => {} } };
   const y1 = window.useTransform ? window.useTransform(scrollY, [0, 3000], [0, -800]) : 0;
   const y2 = window.useTransform ? window.useTransform(scrollY, [0, 3000], [0, 400]) : 0;
@@ -137,6 +138,7 @@ const CryptoNetwork = () => {
 export default function LandingPage() {
   const [navScrolled, setNavScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('');
+  const [selectedAwareness, setSelectedAwareness] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -159,16 +161,56 @@ export default function LandingPage() {
   }, []);
 
   const bentoItems = [
-    { title: "Phishing Scams", desc: "Deceptive emails designed to steal your credentials." },
-    { title: "Strong Passwords & 2FA", desc: "Your password is a key to your digital life." },
-    { title: "Public Wi-Fi Risks", desc: "Unsecured public networks are a hunting ground." },
-    { title: "Mobile Security", desc: "Your phone contains a wealth of personal data." },
-    { title: "Cloud Security", desc: "While convenient, cloud services need strong security." },
-    { title: "Social Engineering", desc: "Attackers manipulate human psychology rather than code." },
-    { title: "Ransomware Protection", desc: "Malicious software locks your files until a ransom is paid." },
-    { title: "Secure Remote Work", desc: "Working from home introduces new security challenges." },
-    { title: "IoT Device Security", desc: "Smart devices can be weak points in your network." },
-    { title: "Recognizing Scams", desc: "Scammers constantly invent new ways to trick you." }
+    {
+      title: "Phishing Scams",
+      desc: "Deceptive emails designed to steal your credentials. Always question unsolicited requests for personal information.",
+      takeaways: ["Verify sender email addresses", "Never click suspicious links", "Look for typos and urgent language"]
+    },
+    {
+      title: "Strong Passwords & 2FA",
+      desc: "Your password is a key to your digital life. Two-Factor Authentication (2FA) adds a crucial second lock.",
+      takeaways: ["Use a password manager", "Enable 2FA everywhere possible", "Mix uppercase, lowercase, numbers, and symbols"]
+    },
+    {
+      title: "Public Wi-Fi Risks",
+      desc: "Unsecured public networks are a hunting ground for attackers. Your data can be easily intercepted.",
+      takeaways: ["Avoid sensitive transactions", "Use a trusted VPN service", "Ensure websites use HTTPS"]
+    },
+    {
+      title: "Mobile Security",
+      desc: "Your phone contains a wealth of personal data. Protecting it is as important as protecting your computer.",
+      takeaways: ["Only install apps from official stores", "Keep your OS and apps updated", "Be wary of app permissions"]
+    },
+    {
+      title: "Cloud Security",
+      desc: "While convenient, cloud services need strong security settings to protect your stored files and data.",
+      takeaways: ["Use strong, unique passwords", "Manage sharing permissions carefully", "Understand the service's privacy policy"]
+    },
+    {
+      title: "Social Engineering",
+      desc: "Attackers often manipulate human psychology rather than code to gain access to systems and data.",
+      takeaways: ["Be skeptical of urgent or emotional requests", "Verify identities through a separate channel", "Never share sensitive info on a call"]
+    },
+    {
+      title: "Ransomware Protection",
+      desc: "This malicious software locks your files until a ransom is paid. Prevention is the best defense.",
+      takeaways: ["Regularly back up important files offline", "Be cautious of email attachments", "Use reputable antivirus software"]
+    },
+    {
+      title: "Secure Remote Work",
+      desc: "Working from home introduces new security challenges for both employees and companies.",
+      takeaways: ["Secure your home Wi-Fi network", "Use company-provided VPNs", "Keep work and personal devices separate"]
+    },
+    {
+      title: "IoT Device Security",
+      desc: "Smart devices, from cameras to thermostats, can be weak points in your network if not properly secured.",
+      takeaways: ["Change default manufacturer passwords", "Keep device firmware updated", "Isolate IoT devices on a separate network"]
+    },
+    {
+      title: "Recognizing Scams",
+      desc: "Scammers constantly invent new ways to trick you, often with promises of rewards or false emergencies.",
+      takeaways: ["If it seems too good to be true, it is", "Legitimate companies won't ask for gift cards", "Slow down and think before you click"]
+    }
   ];
 
   const services = [
@@ -388,6 +430,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: (index % 4) * 0.1, ease: "easeOut" }}
                 viewport={{ once: false, amount: 0.1 }}
+                onClick={() => setSelectedAwareness(item)}
                 className={`group relative p-10 rounded-3xl bg-white/70 backdrop-blur-xl shadow-xl shadow-slate-200/50 border border-white/80 hover:border-indigo-300 hover:bg-white/90 transition-all duration-500 cursor-pointer overflow-hidden ${index === 0 || index === 5 ? 'md:col-span-2 lg:col-span-2' : ''}`}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -542,6 +585,52 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+      {/* Awareness Modal */}
+      <AnimatePresence>
+        {selectedAwareness && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedAwareness(null)}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white/90 backdrop-blur-xl shadow-2xl rounded-3xl border border-white p-8 md:p-12 max-w-2xl w-full relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-400 to-indigo-600"></div>
+              <button 
+                onClick={() => setSelectedAwareness(null)}
+                className="absolute top-6 right-6 text-slate-400 hover:text-slate-800 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+
+              <h3 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 pr-12">{selectedAwareness.title}</h3>
+              <p className="text-lg text-slate-600 font-light mb-8 leading-relaxed">
+                {selectedAwareness.desc}
+              </p>
+
+              <div className="bg-indigo-50/50 rounded-2xl p-6 border border-indigo-100/50">
+                <h4 className="text-indigo-600 font-bold uppercase tracking-widest text-sm mb-4">Key Takeaways</h4>
+                <ul className="space-y-3">
+                  {selectedAwareness.takeaways.map((takeaway, i) => (
+                    <li key={i} className="flex items-start">
+                      <svg className="w-5 h-5 text-indigo-400 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                      <span className="text-slate-700">{takeaway}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
